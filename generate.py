@@ -5,7 +5,7 @@
 Github：github.com/flymysql
 """
 from parser import Node,build_ast
-from LL import analysis
+from LR import analysis
 import sys, os, re
 sys.path.append(os.pardir)
 from lexer import word_list
@@ -39,7 +39,6 @@ tmp记录零时变量id
 mid_result = []
 while_flag = []
 tmp = 0
-code_block = 0
 
 """
 递归遍历语法树
@@ -59,7 +58,6 @@ def view_astree(root, ft=None):
         out(root)
     else:
         re = ""
-        """一条语句肯定只能传回来一个值"""
         for c in root.child:
             cre = view_astree(c)
             if cre != None:
@@ -67,6 +65,10 @@ def view_astree(root, ft=None):
         return re
 
 def math_op(root, ft=None):
+    if root == None or root.text == "(" or root.text == ")":
+        return
+    elif len(root.child) == 0 and root.text != None:
+        return root.text
     global mid_result
     global tmp
     """
@@ -84,13 +86,13 @@ def math_op(root, ft=None):
         if len(root.child) > 1:
             """
             临时变量Tn
-            ft 为父节点传入的操作符左边部分临时id
+     ft 为父节点传入的操作符左边部分临时id
             """
             t = "T" + str(tmp)
             tmp += 1
             mid_result.append(Mnode(math_op(root.child[0]), math_op(root.child[1]), ft,t))
             ct = math_op(root.child[2], t)
-            """判断下一个右递归是否为空"""
+ 
             if ct != None:
                 return ct
             return t
@@ -115,7 +117,12 @@ def math_op(root, ft=None):
         judge(root)
         return
     else:
-        return view_astree(root)
+        re = ""
+        for c in root.child:
+            cre = math_op(c)
+            if cre != None:
+                re = cre
+        return re
 
 
 """
@@ -131,7 +138,7 @@ def judge(root):
     elif len(root.child) == 0 and root.text != None:
         return root.text
     if root.type == "Ptype":
-        if root.child[0] == "if":
+        if root.child[0].text == "if":
             while_flag.append([False])
         else:
             """
@@ -148,9 +155,9 @@ def judge(root):
         """
         Pm = root.child[1].child
         if len(Pm) == 1:
-            mid_result.append(Mnode("j=", 1, view_astree(root.child[0]),"+2"))
+            mid_result.append(Mnode("j=", 1, math_op(root.child[0]),"+2"))
         else:
-            mid_result.append(Mnode("j"+view_astree(Pm[0]), view_astree(root.child[0]), view_astree(Pm[1]),"+2"))
+            mid_result.append(Mnode("j"+judge(Pm[0]), math_op(root.child[0]), math_op(Pm[1]),"+2"))
         return
     if root.type == "Pro":
         """
@@ -164,11 +171,11 @@ def judge(root):
         结束标记
         """
         w = while_flag.pop()
-        global code_block
+        code_block = len(mid_result)
         code = "block" + str(code_block)
         mid_result.append(Mnode("j",0, 0,code))
         view_astree(root)
-        if w[0]:
+        if w[0] == True:
             mid_result.append(Mnode("j",0,0,"W"+str(w[1])))    
         mid_result.append(Mnode("code_block",0,0,code))
         code_block += 1

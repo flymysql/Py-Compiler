@@ -7,12 +7,14 @@ int main(){
     int index = 0;
     // 求０～２０的斐波那契数列
     while(index < 20){
-        printf(a);
         int tmp = c;
         c = a + b;
         a = b;
         b = tmp;
         index = index + 1;
+        if(a > 10){
+            printf(a);
+        }
     }
     if(c == a+b){
         printf(c);
