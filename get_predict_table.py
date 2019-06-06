@@ -28,8 +28,9 @@ grammars = {
     "F":["number", "BRA", "M"],
     "BRA": ["( E )"],
 
-    "OUT":["( V )"],
-    "V":["name VV", "null"],
+    "OUT":["( TXT V )"],
+    "TXT":['" TEXT "'],
+    "V":[", name VV", "null"],
     "VV":[", name VV", "null"],
 
     "Pan":["Ptype P_block Pro"],
@@ -172,7 +173,7 @@ def creat_predict_table():
     get_predict_table()
     return predict_table
 
-if __name__ == "__main__":
+def show_tables():
     get_first_table()
     find_follow()
     get_predict_table()
@@ -186,3 +187,6 @@ if __name__ == "__main__":
     print("\n预测表如下\n")
     for k in predict_table:
         print(k, predict_table[k])
+
+if __name__ == "__main__":
+    show_tables()

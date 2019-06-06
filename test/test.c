@@ -1,27 +1,18 @@
 
 // 兰州小红鸡的注释测试
 int main(){
-    int a = 0;
+    int a = 1;
     int b = 1;
-    int c = 1;
+    int c = 2;
     int index = 0;
     // 求０～２０的斐波那契数列
-    while(index < 20){
+    while(index < 10 ){
         int tmp = c;
-        c = a + b;
+        c = c+b;
         a = b;
         b = tmp;
         index = index + 1;
-        if(a > 10){
-            printf(a);
-        }
+        printf("f(%d) = %d\n", index,a);
     }
-    if(c == a+b){
-        printf(c);
-    }
-    printf(a,b);
-
-    /*printf和控制语句的四元式还没写
-    多行注释测试
-    */
+    printf("斐波那契数列打印完成，由小鸡编译器提供\n");
 }

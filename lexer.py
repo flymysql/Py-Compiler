@@ -40,6 +40,7 @@ class word_list():
         self.operator_list = []      # 运算符
         self.name_list = []          # 变量
         self.key_word_table = []     # 关键字
+        self.string_list = []
         self.flag = True             # 源代码是否正确标识
         
         # get_word函数将源代码切割
@@ -50,6 +51,7 @@ class word_list():
         name_id = 0
         kuo_list = []           # 存储括号并判断是否完整匹配
         char_flag = False
+        string_list = []
         strings = ""
         for word in in_words:
             w = word['word']
@@ -60,8 +62,9 @@ class word_list():
                 else:
                     char_flag = False
                     self.word_list.append({'line':line, 'type':'TEXT', 'word':strings})
+                    self.string_list.append(strings)
                     strings = ""
-                self.word_list.append({'line':line, 'type':'separator', 'word':w})
+                self.word_list.append({'line':line, 'type':w, 'word':w})
                 continue
             # 判断是否为字符串
             if char_flag == True:

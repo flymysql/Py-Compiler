@@ -146,7 +146,7 @@ def judge(root):
             """
             cur = len(mid_result)
             while_flag.append([True,cur])
-            mid_result.append(Mnode("code_bloc", 0, 0, "W" + str(cur)))
+            mid_result.append(Mnode("code_block", 0, 0, "W" + str(cur)))
     if root.type == "Pbc":
         """
         判断语句括号中的的两种情况
@@ -155,9 +155,9 @@ def judge(root):
         """
         Pm = root.child[1].child
         if len(Pm) == 1:
-            mid_result.append(Mnode("j=", 1, math_op(root.child[0]),"+2"))
+            mid_result.append(Mnode("j=", 1, math_op(root.child[0]),"code"+str(len(mid_result)+1)))
         else:
-            mid_result.append(Mnode("j"+judge(Pm[0]), math_op(root.child[0]), math_op(Pm[1]),"+2"))
+            mid_result.append(Mnode("j"+judge(Pm[0]), math_op(root.child[0]), math_op(Pm[1]),"code"+str(len(mid_result)+1)))
         return
     if root.type == "Pro":
         """
@@ -174,6 +174,7 @@ def judge(root):
         code_block = len(mid_result)
         code = "block" + str(code_block)
         mid_result.append(Mnode("j",0, 0,code))
+        mid_result.append(Mnode("code_block",0,0,"code"+str(code_block)))
         view_astree(root)
         if w[0] == True:
             mid_result.append(Mnode("j",0,0,"W"+str(w[1])))    
@@ -196,19 +197,32 @@ def judge(root):
 def out(root):
     if root == None or root.text == "(" or root.text == ")":
         return
-    elif root.type == "name":
-        mid_result.append(Mnode("print", 0, 0,root.text))
-        return
+    elif root.type == "V":
+        if len(root.child) <= 1:
+            mid_result.append(Mnode("print", '-1', '-1', '-1'))
+            return
+        else:
+            name = [root.child[1].text]
+            V = root.child[2]
+            while len(V.child) > 1:
+                name.append(V.child[1].text)
+                V = V.child[2]
+            name.extend(['-1','-1','-1'])
+            mid_result.append(Mnode("print", name[0], name[1], name[2]))
     else:
         for c in root.child:
             out(c)
 
+def creat_mcode(filename):
+    w_list = word_list(filename)
+    word_table = w_list.word_list
+    string_list = w_list.string_list
+    root = analysis(word_table)[1]
+    view_astree(root)
+    return {"name_list":w_list.name_list, "mid_code":mid_result, "tmp":tmp, "strings":string_list}
         
 if __name__ == "__main__":
     filename = 'test/test.c'
-    w_list = word_list(filename)
-    word_table = w_list.word_list
-    root = analysis(word_table)[1]
-    view_astree(root)
+    creat_mcode(filename)
     for r in mid_result:
         print(r)
