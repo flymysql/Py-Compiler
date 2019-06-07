@@ -24,8 +24,8 @@ k_list = {
 
 Cmp = ["<", ">", "==", "!=", ">=", "<="]
 
-Type = {"int","float","char","double","void","long","unsigned"}
-
+Type = {"int","float","char","double","void","long","unsigned","string"}
+type_flag = ""
 # 括号配对判断
 kuo_cp = {'{':'}', '[':']', '(':')'}
 
@@ -51,24 +51,37 @@ class word_list():
         name_id = 0
         kuo_list = []           # 存储括号并判断是否完整匹配
         char_flag = False
+        str_flag = False
         string_list = []
         strings = ""
+        chars = ""
         for word in in_words:
             w = word['word']
             line = word['line']
             if w == '"':
+                if str_flag == False:
+                    str_flag = True
+                else:
+                    str_flag = False
+                    self.word_list.append({'line':line, 'type':'TEXT', 'word':strings})
+                    self.string_list.append(strings)
+                    strings = ""
+                # self.word_list.append({'line':line, 'type':w, 'word':w})
+                continue
+            # 判断是否为字符串
+            if str_flag == True:
+                strings += w
+                continue
+            if w == "'":
                 if char_flag == False:
                     char_flag = True
                 else:
                     char_flag = False
-                    self.word_list.append({'line':line, 'type':'TEXT', 'word':strings})
-                    self.string_list.append(strings)
-                    strings = ""
-                self.word_list.append({'line':line, 'type':w, 'word':w})
+                    self.word_list.append({'line':line, 'type':'CHAR', 'word':chars})
+                    chars = ""
                 continue
-            # 判断是否为字符串
             if char_flag == True:
-                strings += w
+                chars += w
                 continue
             # 判断为关键字
             if w in k_list:
@@ -78,6 +91,7 @@ class word_list():
                 self.word_list.append({'line':line, 'type':"Cmp", 'word':w})
             # 判断为关键字
             elif w in Type:
+                type_flag = w
                 self.key_word_table.append({'line':line, 'type':'type', 'word':w})
                 self.word_list.append({'line':line, 'type':'type', 'word':w})
             # 判断为运算符
@@ -108,7 +122,7 @@ class word_list():
                     if have_name(self.name_list,w):
                         self.word_list.append({'line':line, 'type':'name', 'word':w, 'id':name_id})
                     else:
-                        self.name_list.append({'line':line, 'id':name_id, 'word':0.0, 'name':w})
+                        self.name_list.append({'line':line, 'id':name_id, 'word':0.0, 'name':w, 'flag':type_flag})
                         self.word_list.append({'line':line, 'type':'name', 'word':w, 'id':name_id})
                         name_id += 1
                 else:

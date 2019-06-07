@@ -6,13 +6,14 @@ import os
 from lexer import word_list
 
 head = """
-:::PCC编译器——Ｃ语言语法编译器，当前版本1.00
+:::PCC编译器——Ｃ语言编译器，当前版本1.00
 :::作者：小鸡\t项目地址:https://github.com/flymysql/Py-Compiler
 :::查看使用帮助：pcc -h
 """
 
 phelp = """\tpcc -o (filename)\t直接编译生成可执行程序
 \tpcc -s (filename)\t生成汇编源码
+\tpcc -m (filename)\t查看生成的四元式
 \tpcc -t (filename)\t查看语法树生成过程
 \tpcc -l (filename)\t查看词法分析
 \tpcc -p \t查看本编译器的预测分析表
@@ -47,6 +48,9 @@ def begin():
                 print("编译成功，执行："+slist[2][:-2])
             except:
                 print("\t编译失败！！！")
+        elif slist[1] == "-m":
+            mid = creat_mcode(slist[2])['mid_code']
+            print(mid)
         elif slist[1] == "-s":
             try:
                 to_asm(slist[2])

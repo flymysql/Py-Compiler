@@ -5,10 +5,18 @@
 Github：github.com/flymysql
 """
 from parser import Node,build_ast
+from other.function import if_num 
 from LR import analysis
 import sys, os, re
 sys.path.append(os.pardir)
 from lexer import word_list
+
+operator = {
+    "+": lambda a, b: a+b,
+    "-": lambda a, b: a-b,
+    "*": lambda a, b: a*b,
+    "/": lambda a, b: a/b
+}
 
 """
 四元式对象
@@ -38,7 +46,9 @@ tmp记录零时变量id
 """
 mid_result = []
 while_flag = []
+arr = {}
 tmp = 0
+type_flag = ""
 
 """
 递归遍历语法树
@@ -46,6 +56,9 @@ tmp = 0
 
 """
 def view_astree(root, ft=None):
+    global type_flag
+    if root.type == "type":
+        type_flag = root.text
     if root == None or root.text == "(" or root.text == ")":
         return
     elif len(root.child) == 0 and root.text != None:
@@ -60,39 +73,53 @@ def view_astree(root, ft=None):
         re = ""
         for c in root.child:
             cre = view_astree(c)
-            if cre != None:
+            if cre != None  and cre not in "[]}{)(\"'":
                 re = cre
         return re
 
 def math_op(root, ft=None):
-    if root == None or root.text == "(" or root.text == ")":
+    if root == None:
         return
     elif len(root.child) == 0 and root.text != None:
         return root.text
     global mid_result
     global tmp
+    global arr
+    global type_flag
     """
     变量声明语句，两种情况
     1. 直接赋值
     2. 不赋值
     """
     if root.type == "L":
-        if len(root.child[1].child) == 1:
-            mid_result.append(Mnode("=",0,0,math_op(root.child[0])))
+        
+        c1 = root.child[1]
+        if len(c1.child) == 1:
+            mid_result.append(Mnode("=",0,0,math_op(root.child[0].child[0])))
+        elif c1.child[0].type == "=":
+            mid_result.append(Mnode("=",math_op(c1),0,math_op(root.child[0].child[0])))
         else:
-            mid_result.append(Mnode("=",math_op(root.child[1]),0,math_op(root.child[0])))
-
+            if len(c1.child[1].child) >1:
+                cc1 = c1.child[1]
+                mid_result.append(Mnode("=",math_op(cc1),0,math_op(root.child[0].child[0]) +"[]" + math_op(c1.child[0])))
+            if math_op(root.child[0].child[0]) not in arr:
+                arr[math_op(root.child[0].child[0])] = [math_op(c1.child[0]), type_flag]
+                type_flag = ""
     elif root.type == "ET" or root.type == "TT":
         if len(root.child) > 1:
+            op = Mnode(math_op(root.child[0]))
+            arg1 = math_op(root.child[1])
+            if if_num(arg1) and if_num(ft):
+                return str(operator[op](int(arg1), int(ft)))
+
             """
             临时变量Tn
-     ft 为父节点传入的操作符左边部分临时id
+            ft 为父节点传入的操作符左边部分临时id
             """
             t = "T" + str(tmp)
             tmp += 1
-            mid_result.append(Mnode(math_op(root.child[0]), math_op(root.child[1]), ft,t))
+            mid_result.append(Mnode(op, arg1, ft,t))
             ct = math_op(root.child[2], t)
- 
             if ct != None:
                 return ct
             return t
@@ -104,23 +131,34 @@ def math_op(root, ft=None):
         不存在右递归的话直接赋值
         """
         if len(root.child[1].child) > 1:
+            op = math_op(root.child[1].child[0])
+            arg1 = math_op(root.child[0])
+            arg2 = math_op(root.child[1].child[1])
+            """静态的计算提前算好"""
+            if if_num(arg1) and if_num(arg2):
+                return str(operator[op](int(arg1), int(arg2)))
+
             t = "T" + str(tmp)
             tmp += 1
-            mid_result.append(Mnode(math_op(root.child[1].child[0]), math_op(root.child[0]), math_op(root.child[1].child[1]),t))
+            mid_result.append(Mnode(op, arg1, arg2,t))
             ct = math_op(root.child[1].child[2], t)
             if ct != None:
                 return ct
             return t
         else:
             return math_op(root.child[0])
-    elif root.type == "Pan":
-        judge(root)
-        return
+    elif root.type == "F" and len(root.child) == 2:
+        c = root.child
+        if c[1].child != [] and c[1].child[0].type == "Size":
+            return c[0].child[0].text + "[]" + math_op(c[1])
+        else:
+            return c[0].child[0].text
+
     else:
         re = ""
         for c in root.child:
             cre = math_op(c)
-            if cre != None:
+            if cre != None and cre not in "[]}{)(\"'":
                 re = cre
         return re
 
@@ -133,7 +171,7 @@ def math_op(root, ft=None):
     ３. if和while的相互嵌套语句
 """
 def judge(root):
-    if root == None or root.text == "(" or root.text == ")":
+    if root == None:
         return
     elif len(root.child) == 0 and root.text != None:
         return root.text
@@ -185,7 +223,7 @@ def judge(root):
         re = ""
         for c in root.child:
             cre = judge(c)
-            if cre != None:
+            if cre != None and cre not in "[]}{)(\"'":
                 re = cre
         return re
 
@@ -195,7 +233,7 @@ def judge(root):
 可处理语句：printf(a,b) 该语法：在括号内只能传入变量参数
 """
 def out(root):
-    if root == None or root.text == "(" or root.text == ")":
+    if root == None:
         return
     elif root.type == "V":
         if len(root.child) <= 1:
@@ -203,10 +241,10 @@ def out(root):
             return
         else:
             name = [root.child[1].text]
-            V = root.child[2]
+            V = root.child[3]
             while len(V.child) > 1:
                 name.append(V.child[1].text)
-                V = V.child[2]
+                V = V.child[3]
             name.extend(['-1','-1','-1'])
             mid_result.append(Mnode("print", name[0], name[1], name[2]))
     else:
@@ -214,12 +252,19 @@ def out(root):
             out(c)
 
 def creat_mcode(filename):
+    global tmp
+    global mid_result
+    global arr
+    arr = {}
+    tmp = 0
+    mid_result = []
     w_list = word_list(filename)
     word_table = w_list.word_list
     string_list = w_list.string_list
     root = analysis(word_table)[1]
     view_astree(root)
-    return {"name_list":w_list.name_list, "mid_code":mid_result, "tmp":tmp, "strings":string_list}
+
+    return {"name_list":w_list.name_list, "mid_code":mid_result, "tmp":tmp, "strings":string_list, "arrs":arr}
         
 if __name__ == "__main__":
     filename = 'test/test.c'

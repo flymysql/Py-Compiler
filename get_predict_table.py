@@ -18,26 +18,32 @@ grammars = {
     "P":["type L ;", "L ;", "printf OUT ;", "Pan"],
 
     "L":["M LM"],
-    "LM":["= E", "null"],
+    "LM":["= FE", "Size AM","null"],
+    "FE":["E", "TEXT", "CHAR"],
     "M":["name"],
 
     "E":["T ET"],
     "ET":["+ T ET", "- T ET", "null"],
     "T":["F TT"],
     "TT":["* F TT", "/ F TT", "null"],
-    "F":["number", "BRA", "M"],
+    "F":["number", "BRA", "M MS"],
+    "MS":["Size", "null"],
     "BRA": ["( E )"],
 
     "OUT":["( TXT V )"],
-    "TXT":['" TEXT "'],
-    "V":[", name VV", "null"],
-    "VV":[", name VV", "null"],
+    "TXT":['TEXT'],
+    "V":[", name NS VV", "null"],
+    "VV":[", name NS VV", "null"],
+    "NS":["Size", "null"],
 
     "Pan":["Ptype P_block Pro"],
     "Ptype":["if", "while"],
     "P_block":["( Pbc )"],
     "Pbc":["E PM"],
     "PM":["Cmp E", "null"],
+
+    "Size":["[ E ]"],
+    "AM":["= E", "null"]
 }
 
 first_table = {}
