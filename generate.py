@@ -4,7 +4,7 @@
 博客：me.idealli.com
 Github：github.com/flymysql
 """
-from parser import Node,build_ast
+# from parser import Node,build_ast
 from other.function import if_num 
 from LR import analysis
 import sys, os, re
@@ -240,11 +240,11 @@ def out(root):
             mid_result.append(Mnode("print", '-1', '-1', '-1'))
             return
         else:
-            name = [root.child[1].text]
-            V = root.child[3]
+            name = [math_op(root.child[1])]
+            V = root.child[2]
             while len(V.child) > 1:
-                name.append(V.child[1].text)
-                V = V.child[3]
+                name.append(math_op(V.child[1]))
+                V = V.child[2]
             name.extend(['-1','-1','-1'])
             mid_result.append(Mnode("print", name[0], name[1], name[2]))
     else:

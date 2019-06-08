@@ -32,9 +32,8 @@ grammars = {
 
     "OUT":["( TXT V )"],
     "TXT":['TEXT'],
-    "V":[", name NS VV", "null"],
-    "VV":[", name NS VV", "null"],
-    "NS":["Size", "null"],
+    "V":[", E VV", "null"],
+    "VV":[", E VV", "null"],
 
     "Pan":["Ptype P_block Pro"],
     "Ptype":["if", "while"],

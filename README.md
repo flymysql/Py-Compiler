@@ -37,6 +37,113 @@ exit                    退出
 ```
 pcc -o ./test/test.c
 ```
+
+#### 支持的语法
+
+1. 声明语句和赋值语句
+
+例1：
+```c
+int a;
+a = 10;
+int b = a;
+```
+
+2. 混合四则运算
+例2：
+```c
+int a = 1 + 2*(3 - 4);
+```
+
+3. 数组
+例3：
+```c
+int arr[10];
+a[0] = 1;
+int b = a[0];
+```
+数组下标，即[]中内容也可以用表达式嵌套
+例4:
+```c
+int index = 5;
+arr[index] = 6;
+arr[arr[(index+1)*2-1]] = 7;
+```
+
+4. 输出语句
+目前printf语句的参数最多可以带三个参数
+
+例子5
+```c
+printf("这是个不带参数的printf");
+printf("这是个参数%d",a);
+printf("三个参数：%d,%d,%d",a,b,c);
+
+char c="T";
+printf("字符型参数:%c",c);
+```
+printf语句的参数也可以是表达式
+
+例子6
+```c
+printf("%d", d + 2*(3+4));
+```
+
+5. 控制语句
+
+目前仅支持if判断，可嵌套使用
+例子7
+```c
+if(a < 2*10){
+	a = a + 1;
+	if(c < a){
+		printf("%d", a*c);
+	}
+}
+```
+
+6. while控制语句
+
+这个不多说，也是可嵌套
+```c
+int i = 1;
+printf("正在由pcc编译器为你打印99乘法表！\n");
+while(i < 10){
+	int j = i;
+	while(j < 10){
+		printf("%d*%d=%d\t",i, j, i*j);
+		j = j + 1;
+	}
+	printf("\n");
+	i = i +1;
+}
+```
+
+#### 举个栗子（打印99乘法表）
+
+![](./other/99mul.png)
+
+**源demo**
+```c
+int main(){
+    // 打印99乘法表
+    // int a[10];
+    int i = 1;
+    printf("正在由pcc编译器为你打印99乘法表！\n");
+    while(i < 10){
+        int j = i;
+        while(j < 10){
+            printf("%d*%d=%d\t",i, j, i*j);
+            j = j + 1;
+        }
+        printf("\n");
+        i = i +1;
+    }
+}
+```
+
+#### 举个栗子（打印斐波那契数列）
+
 ![](./other/pcc-o.png)
 
 **ｃ语言源码**

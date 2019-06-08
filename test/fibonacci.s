@@ -4,9 +4,8 @@
 	.comm	T1,4,4
 	.comm	T2,4,4
 	.comm	T3,4,4
-	.comm	T4,4,4
 .LC0:
-	.string "f(%d)=%d%d\n"
+	.string "f(%d)=%d\n"
 .LC1:
 	.string "完成斐波那契数列打印！由小鸡编译器提供——pcc\n"
 	.text
@@ -53,12 +52,8 @@ main:
 	cltq
 	movl	T1(%rip), %ecx
 	movl	%ecx, -112(%rbp, %rax, 4)
-	movl	$2, %eax
-	imull	-12(%rbp), %eax
-	movl	%eax, T3(%rip)
 	movl	-8(%rbp), %eax
 	movl	-12(%rbp), %edx
-	movl	T3(%rip), %ecx
 	movl	%eax, %esi
 	leaq	.LC0(%rip), %rdi
 	movl	$0, %eax
@@ -66,8 +61,8 @@ main:
 	movl	-8(%rbp), %edx
 	movl	$1, %eax
 	addl	%edx, %eax
-	movl	%eax, T4(%rip)
-	movl	T4(%rip), %ecx
+	movl	%eax, T3(%rip)
+	movl	T3(%rip), %ecx
 	movl	%ecx, -8(%rbp)
 	jmp	.W4
 .block6:

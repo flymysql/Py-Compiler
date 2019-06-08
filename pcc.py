@@ -1,3 +1,9 @@
+"""
+PCC编译器入口函数
+作者：刘金明
+博客：me.idealli.com
+Github：github.com/flymysql
+"""
 from to_asm import to_asm
 from generate import creat_mcode
 from get_predict_table import grammars
@@ -50,7 +56,8 @@ def begin():
                 print("\t编译失败！！！")
         elif slist[1] == "-m":
             mid = creat_mcode(slist[2])['mid_code']
-            print(mid)
+            for m in mid:
+                print(m)
         elif slist[1] == "-s":
             try:
                 to_asm(slist[2])
