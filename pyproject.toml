@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pcc-compiler"
+version = "2.0.0"
+description = "PCC — Python 实现的 C 语言编译器（源码 → x86-64 汇编）"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "flymysql", email = "flyphp@outlook.com" }]
+keywords = ["compiler", "python", "parser", "lexer", "asm", "c-language", "ll1"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Education",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Compilers",
+]
+
+[project.scripts]
+pcc = "pcc.cli:main"
+
+[tool.setuptools]
+packages = ["pcc"]

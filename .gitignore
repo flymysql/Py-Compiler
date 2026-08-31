@@ -1,2 +1,11 @@
-__pycache__
-.vscode
+__pycache__/
+*.pyc
+.pytest_cache/
+build/
+dist/
+*.egg-info/
+test/*.s
+test/99mul
+test/fibonacci
+test/print
+test/test
